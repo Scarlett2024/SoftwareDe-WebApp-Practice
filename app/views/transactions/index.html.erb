@@ -1,8 +1,42 @@
 <h1>KelloggCoin Ledger</h1>
 
 <!-- Step 1: List all transactions, starting with the ICO -->
+<p>Here is a list of all the transactions.</p>
+<ol>
+<% transactions = Transaction.all %>
+<% users = User.all %>
+<% from_user_records = {} %>
+<% to_user_records = {} %>
+
+<% for transaction in transactions %>
+<% from_user = User.find_by({"id" => transaction["from_user_id"]})%>
+<% to_user = User.find_by({"id" => transaction["to_user_id"]}) %>
+  <% if transaction["from_user_id"] == nil %>
+    <li> From user nil, to <%=to_user["name"]%>,amount is <%= transaction["amount"] %> </li>
+    <%to_user_records[to_user["name"]] = transaction["amount"]%>
+  <% else %>
+    <li> From <%=from_user["name"] %>, to <%=to_user["name"]%>, amount is <%= transaction["amount"] %>. </li>
+    <%from_user_records[from_user["name"]] = transaction["amount"]%>
+    <%to_user_records[to_user["name"]] = transaction["amount"]%>
+  <% end %>
+<% end %>
+</ol>
 
 <!-- Step 2: Calculate and display the balances -->
+<p>
+<% sums = Hash.new(0) %>
+<% from_user_records.each do |key,value|%>
+  <% sums[key] -= value %>
+<% end %>
+<% to_user_records.each do |key,value| %>
+ <% sums[key] += value %>
+<% end %>
+
+<p>Expected balances:</p>
+<% sums.each do |key,sum| %>
+<p>Balance for <%= key %>: <%= sum %> KC.</p>
+<% end %>
+</p>
 
 <!-- 
 Expected balances:
